@@ -1,124 +1,174 @@
 # Initial Development Harness
 
-Um ponto de partida para conduzir desenvolvimento com agentes especializados, gates explicitos, planejamento auditavel, revisao independente, verificacao real e memoria operacional.
+A starting point for development with specialized agents, explicit gates, auditable planning, independent review, real verification, and operational memory.
 
-O harness fornece o sistema para definir produto, stack e arquitetura antes da implementacao e preservar as decisoes durante a evolucao do projeto. Este repositorio contem somente o harness generico. Os documentos-base de produto e fundacao tecnica comecam como `pending`; nao ha produto, stack, regras de negocio, PRDs ou specs de aplicacao predefinidos.
+The harness provides a system for defining the product, stack, and architecture before implementation and preserving decisions as the project evolves. This repository contains only the generic harness. The product and technical-foundation templates start as `pending`; no application product, stack, business rules, PRDs, or specs are predefined.
 
-**O orquestrador e o proprio agente raiz: o agente principal com quem voce conversa.** Ele coordena os especialistas diretamente. Nao existe um subagente separado chamado `orchestrator` neste harness.
+**The orchestrator is the root agent: the main agent you talk to.** It coordinates specialists directly. There is no separate `orchestrator` subagent in this harness.
 
-## Visao rapida
+## At a glance
 
-| Parte | Para que existe | Onde ver |
+| Part | Purpose | Reference |
 |---|---|---|
-| Orquestracao pelo agente raiz | Selecionar agentes, aplicar gates e consolidar handoffs | [Orquestracao de agentes](#como-funciona-a-orquestracao-de-agentes) |
-| Produto | Preservar problema, usuarios, valor, escopo, jornadas e regras | [`docs/product/`](docs/product/) |
-| Fundacao tecnica | Definir stack, fronteiras, capacidades, comandos e testes | [`docs/project/technical-foundation.md`](docs/project/technical-foundation.md) |
-| Planejamento | Transformar features em PRDs executaveis ou specs auditaveis | [`docs/planning/`](docs/planning/) |
-| Agentes e skills | Separar responsabilidades e procedimentos especializados | [`.codex/agents/`](.codex/agents/) e [`.codex/skills/`](.codex/skills/) |
-| Memoria operacional | Manter tarefa ativa, sessoes, decisoes e contexto reutilizavel | [Skill de memoria](.codex/skills/memory/manage-operational-memory/SKILL.md) |
-| Qualidade e verificacao | Evitar autoaprovacao e produzir evidencias independentes | [`AGENTS.md`](AGENTS.md) |
+| Root-agent orchestration | Select agents, enforce gates, and consolidate handoffs | [Agent orchestration](#how-agent-orchestration-works) |
+| Product | Preserve the problem, users, value, scope, journeys, and rules | [`docs/product/`](docs/product/) |
+| Technical foundation | Define the stack, boundaries, capabilities, commands, and tests | [`docs/project/technical-foundation.md`](docs/project/technical-foundation.md) |
+| Planning | Turn features into executable PRDs or auditable specs | [`docs/planning/`](docs/planning/) |
+| Agents and skills | Separate specialized responsibilities from procedures | [`.codex/agents/`](.codex/agents/) and [`.codex/skills/`](.codex/skills/) |
+| Operational memory | Maintain the active task, sessions, decisions, and reusable context | [Memory skill](.codex/skills/memory/manage-operational-memory/SKILL.md) |
+| Quality and verification | Prevent self-approval and produce independent evidence | [`AGENTS.md`](AGENTS.md) |
 
-## Execucoes principais
+## Prerequisites and adoption
 
-Estas sao as execucoes mais relevantes para entender e apresentar o harness. O agente raiz escolhe o fluxo e dispensa etapas apenas quando houver justificativa.
+This is a collection of instructions, agent definitions, skills, and documentation templates. It does not bundle an agent runtime, installation scripts, or a host configuration that registers the agents for you.
 
-| Execucao | Quando acontece | Agentes mais comuns | Resultado |
+To use the coordinated workflow, you need an agent-capable host that can read and edit repository files, execute the project's eventual verification commands, and invoke actual specialized agents. The definitions in `.codex/agents/` and procedures in `.codex/skills/` must be made available through that host's supported configuration. Do not assume that copying these files automatically registers agents or skills in every host. Frontend verification also requires an operational browser backend when that stage is selected.
+
+1. Obtain a local checkout and inspect [`AGENTS.md`](AGENTS.md), the agent definitions, and the skills.
+2. Configure your host to expose the required agents and skills and give them access to the project workspace. The documented multi-agent workflow assumes a shared repository filesystem.
+3. For an adopting project, bring the harness instructions, `.codex/agents/`, `.codex/skills/`, and `docs/` templates into that repository, reconciling existing project instructions and documents instead of overwriting them. Merge the relevant entries from this repository's `.gitignore`, including `.codex/memory`, into the adopting repository's `.gitignore` without overwriting its existing entries.
+4. Ask the root agent to follow [`docs/project/START_HERE.md`](docs/project/START_HERE.md), using the example prompt below. Define the product before selecting the stack or architecture.
+
+There are no application build, test, or start commands yet. The adopting project's technical foundation records those commands once its stack is defined. See [License](#license) for reuse and redistribution terms.
+
+## Repository layout
+
+```text
+.
+|-- AGENTS.md                  # Permanent repository invariants
+|-- README.md                  # Harness overview and onboarding
+|-- .codex/
+|   |-- agents/                # Specialized agent definitions (.toml)
+|   |-- skills/                # Procedures, references, and templates
+|   `-- memory/                # Local operational context, initialized during work
+`-- docs/
+    |-- product/               # Canonical product definition and catalog
+    |-- project/               # Initial-definition guide and technical foundation
+    |-- planning/              # PRDs and derived specs
+    `-- decisions/             # Canonical product and project decisions
+```
+
+Operational memory is local and Git-ignored; it is not a substitute for the shared documents under `docs/`.
+
+## Quality Gates
+
+Quality gates are explicit conditions for advancing or completing work. The root agent checks the applicable criteria; a blocked stage cannot be treated as complete.
+
+| Stage | Criteria for proceeding |
+|---|---|
+| Definition and planning | The product and technical foundation must be `ready` before feature planning. The feature must be `ready-for-planning` before its PRD is created. |
+| Feature implementation | Requires an `executable` PRD or approved spec, with scope, acceptance criteria, and dependencies resolved. `superseded` contracts do not authorize implementation. |
+| Tests | Business-rule changes require unit tests; changes to flows, contracts, persistence, or integrations require integration tests proportional to risk. |
+| Independent review | Implementers do not approve their work alone. Code changes receive `quality` review, including independent backend verification when applicable. |
+| Frontend verification | When selected by the routing criteria, `frontend_verifier` operates the real flow and presents evidence. An unavailable browser blocks the stage; it does not justify skipping it. |
+| Harness consistency | Changes to instructions, agents, skills, structural memory, or routing require `skill_guard` review. Other changes that may make skills obsolete also require impact analysis and an audit. |
+| Completion | Reported checks require real evidence; the ledger cannot contain pending calls. Failures return to the responsible owner, and blockers must identify a cause and next step. |
+
+Simple maintenance may use the short flow with recorded scope, acceptance criteria, and proportional checks. This does not remove applicable invariants or allow stages to be skipped without justification.
+
+This table summarizes the rules; the authoritative sources remain [`AGENTS.md`](AGENTS.md) and the [routing criteria](.codex/skills/coordination/primary-agent-coordination/references/routing.md).
+
+## Main workflows
+
+These are the main workflows for understanding and presenting the harness. The root agent selects the flow and skips stages only with a recorded reason.
+
+| Workflow | When it applies | Typical agents | Outcome |
 |---|---|---|---|
-| Definicao inicial | O repositorio ainda nao tem produto ou fundacao tecnica `ready` | `product` -> `planner` + `architect` | Produto e fundacao prontos para planejar |
-| Planejamento de feature | Uma feature esta `ready-for-planning` | `product` -> `planner` -> `architect` quando necessario -> `quality` | PRD executavel ou specs aprovadas |
-| Implementacao backend | A entrega altera servicos, contratos, dados ou integracoes | `backend` -> `quality` (revisao e verificacao backend) | Codigo, testes e verificacao tecnica independente |
-| Implementacao frontend | A entrega altera interface, estados ou navegacao | `frontend` -> `quality` -> `frontend_verifier` quando selecionado | Interface testada e evidencias tecnicas/visuais aplicaveis |
-| Implementacao full-stack | Backend e frontend mudam com contrato e escopo fechados | `backend` + `frontend` -> `quality` -> `frontend_verifier` quando selecionado | Fluxo integrado e verificado ponta a ponta |
-| Mudanca de regra de negocio | Uma regra e criada, alterada ou removida | `product` antes de planejamento ou implementacao | Regra canonica revisada; mudanca material confirmada pelo usuario |
-| Evolucao do harness | Mudam `AGENTS.md`, agents, skills, memoria estrutural ou roteamento | owner da mudanca -> `quality` -> `skill_guard` | Sistema de agentes coerente e auditado |
+| Initial definition | The repository does not yet have a `ready` product or technical foundation | `product` -> `planner` + `architect` | Product and foundation ready for planning |
+| Feature planning | A feature is `ready-for-planning` | `product` -> `planner` -> `architect` when needed -> `quality` | Executable PRD or approved specs |
+| Backend implementation | The deliverable changes services, contracts, data, or integrations | `backend` -> `quality` (review and backend verification) | Code, tests, and independent technical verification |
+| Frontend implementation | The deliverable changes the interface, states, or navigation | `frontend` -> `quality` -> `frontend_verifier` when selected | Tested interface and applicable technical/visual evidence |
+| Full-stack implementation | Backend and frontend change with settled contracts and scope | `backend` + `frontend` -> `quality` -> `frontend_verifier` when selected | Integrated flow verified end to end |
+| Business-rule change | A rule is created, changed, or removed | `product` before planning or implementation | Reviewed canonical rule; material change confirmed by the user |
+| Harness evolution | Changes affect `AGENTS.md`, agents, skills, structural memory, or routing | Change owner -> `quality` -> `skill_guard` | Consistent, audited agent system |
 
-Sempre que a mudanca puder tornar skills obsoletas, o agente raiz chama `skill_guard` para analisar o impacto antes das correcoes. Os responsaveis ajustam os artefatos, `quality` revisa e `skill_guard` realiza a auditoria final. Esse ciclo tambem se aplica a mudancas em codigo, contratos, comandos e regras que afetem as skills.
+Whenever a change may make skills obsolete, the root agent calls `skill_guard` to analyze the impact before corrections. Owners update the artifacts, `quality` reviews them, and `skill_guard` performs the final audit. This cycle also applies to changes in code, contracts, commands, and rules that affect skills.
 
-### Por que separar essas execucoes
+### Why separate these workflows
 
-- **Definicao inicial** impede que stack e arquitetura sejam escolhidas antes de o problema estar claro.
-- **Planejamento** separa decisoes de produto e tecnica da escrita de codigo.
-- **Implementacao** seleciona somente as capacidades aplicaveis, exige escopo aprovado, testes proporcionais e revisao por outro agente.
-- **Mudanca de regra** volta ao `product` para impedir que comportamento de negocio seja alterado silenciosamente.
-- **Evolucao do harness** protege o proprio sistema de coordenacao contra regras conflitantes ou referencias quebradas.
+- **Initial definition** prevents choosing the stack and architecture before the problem is clear.
+- **Planning** separates product and technical decisions from writing code.
+- **Implementation** selects only applicable capabilities and requires approved scope, proportional tests, and review by another agent.
+- **Rule changes** return to `product` to prevent silent changes to business behavior.
+- **Harness evolution** protects the coordination system from conflicting rules or broken references.
 
-## Do produto ao contrato executavel
-
-```text
-Product -> PRD -> Technical Design (quando necessario)
-        -> PRD executable ou specs verticais
-        -> Implementation -> Quality Review -> verificacao aplicavel
-```
-
-Product decide problema, usuarios, valor e regras. Planner define a entrega e como comprova-la. Architect produz ou revisa Technical Design quando ha decisoes arquiteturais relevantes; decisoes simples ficam no PRD/spec. O design pode ser uma secao ou documento vinculado. A fundacao tecnica continua global; decisoes duraveis do projeto podem gerar ADRs.
-
-Um PRD `executable` cobre uma entrega pequena ou media, fechada e verificavel ponta a ponta. `requires-specs` divide multiplas entregas verticais, nunca apenas tabela, endpoint, componente ou testes. O PRD explica o que, por que, resultado, fluxo e limites; specs detalham o contrato sem antecipar codigo de producao.
-
-Cenarios Given/When/Then tornam regras, estados, erros e contratos verificaveis. O plano define expectativas e cobertura; implementadores escrevem testes reais. Pseudocodigo curto, schemas e exemplos so entram para eliminar ambiguidade. Quality confere aderencia ao contrato e ao Technical Design, alem do resultado dos testes.
-
-Para UI, o planejamento registra estados aplicaveis, acessibilidade e `Visual evidence expectations`. Define o que comprovar; o frontend verifier decide como operar o navegador, capturar screenshots e relacionar evidencias aos criterios. Mockups nao substituem verificacao real.
-
-O root avalia complexidade e risco antes de chamar planner. Manutencao simples pode seguir escopo explicito -> implementacao -> quality proporcional, com justificativa registrada. Features continuam exigindo PRD e gates de produto/fundacao; a excecao nao elimina revisao de regras ou garantias de qualidade.
-
-## Primeiro passo em um projeto novo
-
-Antes de implementar codigo, abra [`docs/project/START_HERE.md`](docs/project/START_HERE.md) e solicite ao agente raiz a definicao inicial. Ele chama `product` primeiro e, quando o produto estiver suficiente, coordena `planner` e `architect` para fechar a fundacao tecnica.
+## From product to executable contract
 
 ```text
-Conduza, como agente raiz, a definicao inicial deste projeto seguindo
-docs/project/START_HERE.md. Defina primeiro o produto e depois a fundacao tecnica.
-Nao planeje features nem implemente codigo enquanto os gates estiverem pending.
+Product -> PRD -> Technical Design (when needed)
+        -> executable PRD or vertical specs
+        -> Implementation -> Quality Review -> applicable verification
 ```
 
-O usuario nao precisa escolher os demais agentes. O planejamento de features so comeca quando produto e fundacao tecnica estao `ready`; toda implementacao de feature parte de um PRD `executable` ou de uma spec aprovada. Manutencao simples, local e de baixo risco pode usar o fluxo curto com escopo, aceite e checks registrados.
+Product owns the problem, users, value, and rules. Planner defines the deliverable and how to prove it works. Architect produces or reviews Technical Design for relevant architectural decisions; simple decisions stay in the PRD/spec. The design may be a section or a linked document. The technical foundation remains global; durable project decisions may produce architecture decision records (ADRs).
+
+An `executable` PRD covers one small or medium deliverable with settled scope that can be verified end to end. `requires-specs` splits multiple vertical deliverables, never just a table, endpoint, component, or tests. The PRD explains what, why, outcome, flow, and boundaries; specs detail the contract without prescribing production code.
+
+Given/When/Then scenarios make rules, states, errors, and contracts verifiable. The plan defines expectations and coverage; implementers write the actual tests. Short pseudocode, schemas, and examples are included only to remove ambiguity. Quality checks compliance with the contract and Technical Design, as well as test results.
+
+For UI work, planning records applicable states, accessibility, and `Visual evidence expectations`. It defines what must be proven; the frontend verifier decides how to operate the browser, capture screenshots, and map evidence to criteria. Mockups do not replace real verification.
+
+The root agent assesses complexity and risk before calling planner. Simple maintenance may follow explicit scope -> implementation -> proportional quality review, with a recorded justification. Features still require a PRD and product/foundation gates; the exception does not remove rule review or quality guarantees.
+
+## First step in a new project
+
+Before implementing code, open [`docs/project/START_HERE.md`](docs/project/START_HERE.md) and ask the root agent to conduct the initial definition. It calls `product` first and, once the product is sufficiently defined, coordinates `planner` and `architect` to complete the technical foundation.
+
+```text
+As the root agent, conduct this project's initial definition following
+docs/project/START_HERE.md. Define the product first, then the technical foundation.
+Do not plan features or implement code while the readiness gates remain pending.
+```
+
+The user does not need to choose the other agents. Feature planning begins only when the product and technical foundation are `ready`; every feature implementation starts from an `executable` PRD or approved spec. Simple, local, low-risk maintenance may use the short flow with recorded scope, acceptance criteria, and checks.
 
 <details>
-<summary>O que a definicao inicial prepara</summary>
+<summary>What initial definition prepares</summary>
 
-- produto, usuarios, valor, escopo, jornadas e regras em `docs/product/`;
-- tipo de projeto, capacidades, stack, arquitetura, comandos e testes na fundacao tecnica;
-- contrato do repositorio em `AGENTS.md` e agentes/skills aplicaveis;
-- memoria operacional e validacao do sistema de agentes.
+- Product, users, value, scope, journeys, and rules under `docs/product/`.
+- Project type, capabilities, stack, architecture, commands, and tests in the technical foundation.
+- The repository contract in `AGENTS.md` and applicable agents/skills.
+- Operational memory and validation of the agent system.
 
 </details>
 
-## Como funciona a orquestracao de agentes
+## How agent orchestration works
 
-O agente raiz executa diretamente a skill `primary-agent-coordination`; a coordenacao nao e delegada a um subagente. O projeto usa um modelo **hub-and-spoke** para todo trabalho que exija coordenacao: o agente raiz aplica os readiness gates, escolhe os agentes especializados, acompanha seus handoffs e consolida a resposta final. Os agentes podem trocar mensagens pela infraestrutura, mas o fluxo oficial nao depende de conversa direta entre eles: a coordenacao e centralizada no agente raiz.
+The root agent executes the `primary-agent-coordination` skill directly; coordination is not delegated to a subagent. The project uses a **hub-and-spoke** model for all work requiring coordination: the root agent applies readiness gates, selects specialized agents, tracks their handoffs, and consolidates the final response. Agents can exchange messages through the infrastructure, but the official flow does not depend on direct conversations between them: coordination is centralized in the root agent.
 
-Uma consulta pode ser respondida diretamente, sem iniciar o fluxo coordenado, somente quando TODOS os criterios forem atendidos: ela e pontual e limitada, deriva do estado local ja existente, e estritamente read-only sem alterar worktree, index, refs, memoria, cache ou estado externo, nao altera artefato e nao requer julgamento especializado, readiness gate, agente, revisao ou verificacao. Se qualquer criterio falhar, o agente raiz inicia o fluxo coordenado.
+A request can be answered directly, without starting the coordinated flow, only when ALL criteria are met: it is narrow and limited, derives from existing local state, is strictly read-only without changing the worktree, index, refs, memory, cache, or external state, changes no artifact, and requires no specialist judgment, readiness gate, agent, review, or verification. If any criterion fails, the root agent starts the coordinated flow.
 
-O diagrama abaixo representa o fluxo coordenado, iniciado quando a excecao de consulta direta nao se aplica:
+The diagram below represents the coordinated flow, which begins when the direct-request exception does not apply:
 
 ```mermaid
 flowchart TB
-    U([Usuario]) --> O["Agente raiz (orquestrador)<br/>classifica, roteia e acompanha"]
+    U([User]) --> O["Root agent (orchestrator)<br/>classifies, routes, and tracks"]
 
-    O -->|"produto ou regra de negocio"| P["Product<br/>produto, catalogo e regras"]
+    O -->|"product or business rule"| P["Product<br/>product, catalog, and rules"]
     P -->|handoff| O
 
-    O -->|"planejamento"| PL["Planner<br/>PRD ou spec auditavel"]
+    O -->|"planning"| PL["Planner<br/>PRD or auditable spec"]
     PL -->|handoff| O
 
-    O -->|"decisoes tecnicas"| A["Architect<br/>fundacao e fronteiras"]
+    O -->|"technical decisions"| A["Architect<br/>foundation and boundaries"]
     A -->|handoff| O
 
-    O -->|"implementacao"| I{"Capacidade aplicavel"}
-    I -->|"se houver backend"| B["Backend"]
-    I -->|"se houver frontend"| F["Frontend"]
+    O -->|"implementation"| I{"Applicable capability"}
+    I -->|"when backend exists"| B["Backend"]
+    I -->|"when frontend exists"| F["Frontend"]
     B -->|handoff| O
     F -->|handoff| O
 
-    O --> Q["Quality<br/>revisao e verificacao backend"]
+    O --> Q["Quality<br/>review and backend verification"]
     Q -->|handoff| O
 
-    O -->|"frontend, quando selecionado"| FV["Frontend verifier"]
-    FV -->|evidencias| O
+    O -->|"frontend, when selected"| FV["Frontend verifier"]
+    FV -->|evidence| O
 
-    O -->|"AGENTS.md, agents, skills, memoria estrutural ou roteamento"| SG["Skill guard"]
-    SG -->|auditoria| O
+    O -->|"AGENTS.md, agents, skills, structural memory, or routing"| SG["Skill guard"]
+    SG -->|audit| O
 
-    O --> R(["Resposta consolidada<br/>ao usuario"])
+    O --> R(["Consolidated response<br/>to the user"])
 
     classDef hub fill:#4f46e5,color:#fff,stroke:#312e81,stroke-width:2px;
     classDef gate fill:#fef3c7,color:#78350f,stroke:#d97706;
@@ -130,102 +180,102 @@ flowchart TB
     class U,R terminal;
 ```
 
-### Ciclo de uma chamada
+### Lifecycle of an agent call
 
-Para cada etapa, o agente raiz:
+For each stage, the root agent:
 
-1. verifica as fontes canonicas e os gates aplicaveis;
-2. registra o agente no **Agent Call Ledger**;
-3. chama o agente real com objetivo, escopo e contexto relevante;
-4. recebe seu handoff com artefatos, evidencias, riscos e bloqueios;
-5. atualiza o ledger e a memoria operacional;
-6. decide se chama o proximo agente, devolve uma falha ao responsavel ou encerra a tarefa.
+1. Checks canonical sources and applicable gates.
+2. Records the agent in the **Agent Call Ledger**.
+3. Invokes the actual agent with the objective, scope, and relevant context.
+4. Receives its handoff with artifacts, evidence, risks, and blockers.
+5. Updates the ledger and operational memory.
+6. Decides whether to call the next agent, return a failure to its owner, or close the task.
 
-O estado normal de uma chamada e:
+The normal call lifecycle is:
 
 ```text
 selected -> called -> handoff_received
                   \-> blocked
 ```
 
-Uma tarefa nao deve ser encerrada com agentes ainda em `selected` ou `called`. Etapas dispensadas ficam como `skipped` e precisam de justificativa. Uma falha volta ao agente responsavel quando a causa estiver comprovada; se a causa for incerta, o fluxo permanece bloqueado ate o diagnostico.
+A task must not close with agents still in `selected` or `called`. Omitted stages are recorded as `skipped` with a reason. A failure returns to the responsible agent when its cause is proven; if the cause is uncertain, the flow remains blocked until diagnosed.
 
-### Exemplo pratico: planejamento de uma feature
+### Example: planning a feature
 
-Imagine a solicitacao: **"planeje uma feature de recuperacao de senha"**. O exemplo pressupoe que a definicao do produto e a fundacao tecnica estao `ready`. Se o produto ainda estiver `pending`, o fluxo para no gate de produto e o `product` conduz primeiro a definicao inicial. Se a fundacao estiver ausente, `pending` ou insuficiente, o agente raiz chama `planner` e `architect` para defini-la e nao inicia o planejamento da feature ate que ela esteja pronta.
+Imagine the request: **"plan a password-recovery feature."** This example assumes the product definition and technical foundation are `ready`. If the product is still `pending`, the flow stops at the product gate and `product` conducts the initial definition first. If the foundation is missing, `pending`, or insufficient, the root agent calls `planner` and `architect` to define it and does not begin feature planning until it is ready.
 
 ```mermaid
 sequenceDiagram
     autonumber
-    actor U as Usuario
-    participant O as Agente raiz (orquestrador)
+    actor U as User
+    participant O as Root agent (orchestrator)
     participant P as Product
     participant PL as Planner
     participant A as Architect
     participant Q as Quality
 
-    U->>O: Planejar recuperacao de senha
-    O->>O: Ler produto, fundacao, memoria e catalogo
-    O->>P: Validar valor, jornada e regras da feature
-    P-->>O: Feature registrada e ready-for-planning
-    O->>PL: Criar PRD e classificar a entrega
-    PL-->>O: PRD, criterios de aceite, riscos e testes
-    O->>P: Informar caminho do PRD criado
-    P-->>O: Catalogo atualizado para planned
-    opt Decisao tecnica relevante
-        O->>A: Produzir ou revisar Technical Design explicito
-        A-->>O: Design e riscos arquiteturais
+    U->>O: Plan password recovery
+    O->>O: Read product, foundation, memory, and catalog
+    O->>P: Validate feature value, journey, and rules
+    P-->>O: Feature recorded and ready-for-planning
+    O->>PL: Create PRD and classify the deliverable
+    PL-->>O: PRD, acceptance criteria, risks, and tests
+    O->>P: Provide the new PRD path
+    P-->>O: Catalog updated to planned
+    opt Relevant technical decision
+        O->>A: Produce or review explicit Technical Design
+        A-->>O: Design and architectural risks
     end
-    O->>PL: Consolidar contrato executavel ou specs com design aplicavel
-    PL-->>O: Cenarios, criterios e plano de verificacao
-    O->>Q: Revisar planejamento
-    alt Ajustes necessarios
-        Q-->>O: return-for-changes com evidencias
-        alt Planner responsavel pela causa
-            O->>PL: Corrigir PRD
-            PL-->>O: PRD revisado
-        else Product responsavel pela causa
-            O->>P: Corrigir definicao ou regra
-            P-->>O: Fonte canonica revisada
-        else Architect responsavel pela causa
-            O->>A: Corrigir decisao tecnica
-            A-->>O: Decisao revisada
+    O->>PL: Consolidate executable contract or specs with applicable design
+    PL-->>O: Scenarios, criteria, and verification plan
+    O->>Q: Review planning
+    alt Changes required
+        Q-->>O: return-for-changes with evidence
+        alt Planner owns the cause
+            O->>PL: Correct PRD
+            PL-->>O: Revised PRD
+        else Product owns the cause
+            O->>P: Correct definition or rule
+            P-->>O: Revised canonical source
+        else Architect owns the cause
+            O->>A: Correct technical decision
+            A-->>O: Revised decision
         end
-        O->>Q: Revalidar planejamento
+        O->>Q: Revalidate planning
     end
-    Q-->>O: approved ou approved-with-caveats
-    O-->>U: Planejamento consolidado e proximos passos
+    Q-->>O: approved or approved-with-caveats
+    O-->>U: Consolidated plan and next steps
 ```
 
-Resultado esperado desse fluxo:
+Expected outcomes:
 
-- a feature fica registrada no catalogo de produto;
-- o PRD define escopo, fora de escopo, comportamento, representacao visual aplicavel, impacto de arquivos, aceite e testes;
-- decisoes tecnicas relevantes ficam explicitas, sem serem inventadas pelo `planner`;
-- `quality` revisa se o planejamento e implementavel, auditavel e testavel;
-- nenhum codigo de produto e implementado durante o fluxo de planejamento.
+- The feature is recorded in the product catalog.
+- The PRD defines scope, exclusions, behavior, applicable visual representation, file impact, acceptance criteria, and tests.
+- Relevant technical decisions are explicit, rather than invented by `planner`.
+- `quality` reviews whether the plan is implementable, auditable, and testable.
+- No product code is implemented during the planning flow.
 
-Um ledger terminal simplificado poderia ficar assim:
+A simplified final ledger could look like this:
 
-| Agente | Status | Handoff ou justificativa |
+| Agent | Status | Handoff or reason |
 |---|---|---|
-| `product` | `handoff_received` | Feature liberada para planejamento |
-| `planner` | `handoff_received` | PRD executavel entregue |
-| `architect` | `skipped` | Nenhuma decisao tecnica nova |
-| `quality` | `handoff_received` | `approved` em `planning-review` |
-| `skill_guard` | `skipped` | Nenhum impacto em skills ou mudanca no sistema de agentes identificado |
+| `product` | `handoff_received` | Feature released for planning |
+| `planner` | `handoff_received` | Executable PRD delivered |
+| `architect` | `skipped` | No new technical decision |
+| `quality` | `handoff_received` | `approved` in `planning-review` |
+| `skill_guard` | `skipped` | No skill impact or agent-system change identified |
 
-Se o planejamento puder tornar skills obsoletas ou alterar o sistema de agentes, o `skill_guard` deixa de ser `skipped` e realiza a auditoria antes do fechamento. Mudanca material de produto permanece `blocked` ate confirmacao explicita do usuario, sempre intermediada pelo agente raiz.
+If planning may make skills obsolete or change the agent system, `skill_guard` is no longer `skipped` and audits the changes before closure. A material product change remains `blocked` until explicit user confirmation, always mediated by the root agent.
 
-### Exemplo pratico: implementacao de uma feature
+### Example: implementing a feature
 
-Agora imagine: **"implemente a recuperacao de senha conforme o PRD aprovado"**. O exemplo pressupoe produto e fundacao tecnica `ready`, alem de PRD `executable` ou spec aprovada. Se a solicitacao mudar uma regra de negocio, o `product` precisa revisar essa mudanca antes da implementacao. O diagrama ilustra uma entrega full-stack; em uma feature somente backend ou somente frontend, apenas a capacidade aplicavel e chamada.
+Now imagine: **"implement password recovery according to the approved PRD."** This example assumes a `ready` product and technical foundation, plus an `executable` PRD or approved spec. If the request changes a business rule, `product` must review that change before implementation. The diagram illustrates a full-stack deliverable; for a backend-only or frontend-only feature, only the applicable capability is called.
 
 ```mermaid
 sequenceDiagram
     autonumber
-    actor U as Usuario
-    participant O as Agente raiz (orquestrador)
+    actor U as User
+    participant O as Root agent (orchestrator)
     participant PL as Planner
     participant A as Architect
     participant B as Backend
@@ -233,99 +283,109 @@ sequenceDiagram
     participant Q as Quality
     participant FV as Frontend verifier
 
-    U->>O: Implementar conforme o PRD aprovado
-    O->>O: Validar gates, PRD, fundacao, memoria e ledger
-    opt Escopo ainda precisa de confirmacao
-        O->>PL: Confirmar prontidao da spec
-        PL-->>O: Escopo pronto ou bloqueio explicito
+    U->>O: Implement according to the approved PRD
+    O->>O: Validate gates, PRD, foundation, memory, and ledger
+    opt Scope still needs confirmation
+        O->>PL: Confirm spec readiness
+        PL-->>O: Ready scope or explicit blocker
     end
-    opt Decisao tecnica relevante ainda precisa de validacao
-        O->>A: Validar decisao tecnica relevante
-        A-->>O: Fronteiras e contratos confirmados
+    opt Relevant technical decision still needs validation
+        O->>A: Validate relevant technical decision
+        A-->>O: Boundaries and contracts confirmed
     end
-    par Quando houver backend
-        O->>B: Implementar servico, contratos e testes
-        B-->>O: Codigo, testes, checks e riscos
-    and Quando houver frontend
-        O->>F: Implementar telas, estados e testes
-        F-->>O: Codigo, evidencias e riscos
+    par When backend exists
+        O->>B: Implement service, contracts, and tests
+        B-->>O: Code, tests, checks, and risks
+    and When frontend exists
+        O->>F: Implement screens, states, and tests
+        F-->>O: Code, evidence, and risks
     end
-    O->>Q: Revisar entrega e verificar backend de forma independente
-    alt Correcao necessaria
-        Q-->>O: return-for-changes com causa comprovada
-        opt Backend responsavel pela causa
-            O->>B: Corrigir backend
-            B-->>O: Correcao e novos checks
+    O->>Q: Review delivery and independently verify backend
+    alt Correction required
+        Q-->>O: return-for-changes with proven cause
+        opt Backend owns the cause
+            O->>B: Correct backend
+            B-->>O: Correction and new checks
         end
-        opt Frontend responsavel pela causa
-            O->>F: Corrigir frontend
-            F-->>O: Correcao e novos checks
+        opt Frontend owns the cause
+            O->>F: Correct frontend
+            F-->>O: Correction and new checks
         end
-        O->>Q: Revalidar entrega
+        O->>Q: Revalidate delivery
     end
-    Q-->>O: approved ou approved-with-caveats
-    opt Frontend verifier selecionado
-        O->>FV: Operar fluxo real no navegador
-        FV-->>O: Evidencias tecnicas e visuais
+    Q-->>O: approved or approved-with-caveats
+    opt Frontend verifier selected
+        O->>FV: Operate the real flow in the browser
+        FV-->>O: Technical and visual evidence
     end
-    O->>O: Terminalizar ledger e active-task, depois gravar sessao
-    O-->>U: Resultado, arquivos, checks, riscos e pendencias
+    O->>O: Finalize ledger and active-task, then record session
+    O-->>U: Outcome, files, checks, risks, and open items
 ```
 
-Nesse exemplo, backend e frontend so trabalham em paralelo porque o contrato e o escopo ja estao fechados. Se apenas uma capacidade for aplicavel, o outro agente fica `skipped` com justificativa. `quality` revisa a entrega e executa a verificacao independente de backend com a skill `verify-backend-flow`. Seu handoff inclui comandos, resultados e riscos; ele tambem coordena os checks compartilhados para evitar duplicacao. Quando selecionado, `frontend_verifier` continua responsavel pela operacao real no navegador. Uma falha de verificacao retorna pelo agente raiz ao agente responsavel; depois da correcao, revisao e verificacao sao repetidas na proporcao do impacto.
+In this example, backend and frontend work in parallel only because the contract and scope are settled. If only one capability applies, the other agent is `skipped` with a reason. `quality` reviews the deliverable and performs independent backend verification with the `verify-backend-flow` skill. Its handoff includes commands, results, and risks; it also coordinates shared checks to avoid duplication. When selected, `frontend_verifier` remains responsible for real browser operation. Verification failures return through the root agent to the responsible agent; after correction, review and verification are repeated in proportion to the impact.
 
-Um ledger terminal para uma mudanca full-stack pequena poderia ser:
+A final ledger for a small full-stack change could be:
 
-| Agente | Status | Handoff ou justificativa |
+| Agent | Status | Handoff or reason |
 |---|---|---|
-| `planner` | `skipped` | Spec aprovada ja estava pronta |
-| `architect` | `skipped` | Contratos existentes foram preservados |
-| `backend` | `handoff_received` | Implementacao e testes entregues |
-| `frontend` | `handoff_received` | Interface, estados e checks leves entregues |
-| `quality` | `handoff_received` | `approved` em `implementation-review`, com evidencias de verificacao backend |
-| `frontend_verifier` | `skipped` | Mudanca pequena; checks leves ficaram com `frontend` |
-| `skill_guard` | `skipped` | Analise de impacto nao identificou skills afetadas nem mudancas no sistema de agentes |
+| `planner` | `skipped` | Approved spec was already ready |
+| `architect` | `skipped` | Existing contracts were preserved |
+| `backend` | `handoff_received` | Implementation and tests delivered |
+| `frontend` | `handoff_received` | Interface, states, and lightweight checks delivered |
+| `quality` | `handoff_received` | `approved` in `implementation-review`, with backend verification evidence |
+| `frontend_verifier` | `skipped` | Small change; lightweight checks remained with `frontend` |
+| `skill_guard` | `skipped` | Impact analysis found no affected skills or agent-system changes |
 
-Se o `frontend_verifier` tiver sido selecionado, indisponibilidade do navegador gera `blocked`, nunca `skipped`. Antes da resposta final, o agente raiz incorpora o ultimo handoff, terminaliza o ledger e deixa `active-task.md` como `idle` ou `blocked` com causa e proximo passo.
+If `frontend_verifier` was selected, an unavailable browser results in `blocked`, never `skipped`. Before the final response, the root agent incorporates the latest handoff, finalizes the ledger, and leaves `active-task.md` as `idle` or `blocked` with a cause and next step.
 
-### Como o contexto passa entre agentes
+### How context passes between agents
 
-Um agente nao deve depender de receber toda a transcricao dos agentes anteriores. A continuidade usa uma combinacao de mecanismos:
+An agent should not depend on receiving the full transcript of earlier agents. Continuity uses a combination of:
 
-- o payload enviado pelo agente raiz ao iniciar a chamada;
-- o handoff devolvido pelo agente anterior;
-- os arquivos compartilhados no repositorio, incluindo produto, fundacao tecnica, PRDs, specs, decisoes, codigo e diff;
-- a memoria operacional em `.codex/memory/`.
+- The payload sent by the root agent when starting the call.
+- The handoff returned by the previous agent.
+- Shared repository files, including product, technical foundation, PRDs, specs, decisions, code, and diff.
+- Operational memory in `.codex/memory/`.
 
-Nas execucoes multiagente deste projeto, os agentes compartilham o filesystem do repositorio, portanto alteracoes feitas por um agente ficam imediatamente disponiveis aos demais. Ainda assim, documentos canonicos e handoffs explicitos sao preferidos a contexto implicito de conversa.
+In this project's multi-agent workflow, agents share the repository filesystem, so one agent's changes are immediately available to the others. Even so, canonical documents and explicit handoffs are preferred over implicit conversational context.
 
-### Papel da memoria operacional
+### Role of operational memory
 
-A memoria preserva continuidade e checkpoints do trabalho, mas nao substitui Git, PRD, spec ou documentacao canonica.
+Memory preserves continuity and work checkpoints, but does not replace Git, PRDs, specs, or canonical documentation.
 
-| Caminho | Responsabilidade |
+| Path | Responsibility |
 |---|---|
-| `.codex/memory/active-task.md` | Objetivo corrente, fluxo, ledger, estado, checks e bloqueios |
-| `.codex/memory/sessions/` | Resumos finais de execucoes substanciais |
-| `.codex/memory/decisions/` | Rascunhos locais e checkpoints nao canonicos; decisoes duraveis de produto e tecnica ficam em `docs/decisions/` |
-| `.codex/memory/projects/` | Contexto estavel e verificado do projeto |
-| `.codex/memory/runbooks/` | Procedimentos reproduziveis e validados |
-| `.codex/memory/errors/` | Falhas recorrentes com causa comprovada |
+| `.codex/memory/active-task.md` | Current objective, flow, ledger, state, checks, and blockers |
+| `.codex/memory/sessions/` | Final summaries of substantial work sessions |
+| `.codex/memory/decisions/` | Local drafts and noncanonical checkpoints; durable product and technical decisions belong in `docs/decisions/` |
+| `.codex/memory/projects/` | Stable, verified project context |
+| `.codex/memory/runbooks/` | Reproducible, validated procedures |
+| `.codex/memory/errors/` | Recurring failures with proven causes |
 
-O agente raiz e o owner da memoria. Agentes especializados entregam fatos, decisoes, evidencias e riscos em seus handoffs; o agente raiz registra apenas o que precisa sobreviver a chamada. Como essa memoria e um checkpoint operacional mantido pelo fluxo, ela precisa ser atualizada e terminalizada explicitamente no fechamento.
+The root agent owns memory. Specialized agents return facts, decisions, evidence, and risks in their handoffs; the root agent records only what needs to survive the call. Because memory is an operational checkpoint maintained by the workflow, it must be explicitly updated and finalized at closure.
 
-### Paralelismo e independencia
+### Parallelism and independence
 
-Backend e frontend podem trabalhar em paralelo quando escopo e contratos estiverem fechados. Quem implementa nao aprova sozinho a propria entrega: mudancas de codigo passam por `quality`, backend exige verificacao independente pelo proprio `quality`, frontend usa os criterios de selecao de `frontend_verifier`, e mudancas no sistema de agentes exigem `skill_guard`.
+Backend and frontend may work in parallel when scope and contracts are settled. Implementers do not approve their own delivery alone: code changes receive `quality` review, backend requires independent verification by `quality`, frontend follows the selection criteria for `frontend_verifier`, and agent-system changes require `skill_guard`.
 
-As regras detalhadas de roteamento ficam em `.codex/skills/coordination/primary-agent-coordination/`; as responsabilidades individuais ficam em `.codex/agents/`; e as invariantes permanentes do repositorio ficam em `AGENTS.md`.
+Detailed routing rules live in `.codex/skills/coordination/primary-agent-coordination/`; individual responsibilities live in `.codex/agents/`; and permanent repository invariants live in `AGENTS.md`.
 
-Ao adotar este harness em outro repositorio, adapte o README para apresentar o produto e suas instrucoes de desenvolvimento. Neste repositorio, o README apresenta o harness; as regras oficiais de coordenacao permanecem em `AGENTS.md` e na skill `primary-agent-coordination`.
+When adopting this harness in another repository, adapt the README to introduce the product and its development instructions. In this repository, the README introduces the harness; the authoritative coordination rules remain in `AGENTS.md` and the `primary-agent-coordination` skill.
 
-## Rastreabilidade de contratos substituidos
+## Traceability of replaced contracts
 
-PRDs e specs comecam com `Status`, `Supersedes`, `Superseded by` e `Related decisions`. Os links relativos conectam contratos anteriores, sucessores e decisoes canonicas em `docs/decisions/`. A justificativa completa permanece na decisao; Git preserva diffs, mas nao substitui essa navegacao.
+PRDs and specs begin with `Status`, `Supersedes`, `Superseded by`, and `Related decisions`. Relative links connect predecessor contracts, successors, and canonical decisions in `docs/decisions/`. The full rationale remains in the decision; Git preserves diffs but does not replace this navigation.
 
-Product/Architect avalia a mudanca e registra a decisao; Planner cria o contrato sucessor e atualiza os links nos dois sentidos. O documento anterior recebe `superseded`, preserva seu conteudo historico e deixa de ser executavel. `ready` indica planejamento pronto; `active` identifica o contrato aceito como vigente e nao significa implementacao concluida. `draft` e `blocked` continuam impedindo execucao prematura.
+Product/Architect evaluates the change and records the decision; Planner creates the successor contract and updates links in both directions. The predecessor receives `superseded`, preserves its historical content, and is no longer executable. `ready` indicates completed planning; `active` identifies the contract accepted as current and does not mean implementation is complete. `draft` and `blocked` still prevent premature execution.
 
-Veja as [regras de rastreabilidade](.codex/skills/planning/create-spec-driven-plan/references/contract-traceability.md).
+See the [traceability rules](.codex/skills/planning/create-spec-driven-plan/references/contract-traceability.md).
+
+## Contributing and reporting issues
+
+If Issues are enabled, use this repository's GitHub Issues for bug reports or documentation issues and include the relevant file or workflow, expected behavior, actual behavior, and reproduction steps when applicable. For host-specific problems, include the host and configuration details needed to reproduce the issue, without secrets or sensitive data.
+
+For a proposed change, explain the problem, keep the diff focused, and describe the checks performed and any limitations in the pull request. Read [`AGENTS.md`](AGENTS.md) before working with agents in this repository. Changes to coordination rules, agents, or skills should keep their references and responsibilities consistent; the existing review requirements are described above.
+
+## License
+
+Licensed under the [MIT License](LICENSE). You may use, modify, and redistribute the harness under its terms; retain the copyright and permission notice.
