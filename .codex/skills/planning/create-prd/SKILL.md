@@ -10,7 +10,7 @@ Use for every initiative or feature intended for implementation.
 ## Preconditions
 
 - Read the technical foundation; a PRD does not silently decide pending stack or architecture.
-- Read the product definition; a PRD does not invent goals, users, value, or business rules. Rule changes require a `product` handoff.
+- Read the product definition; a PRD does not invent goals, users, value, or business rules. Rule changes require a recorded root-agent product-governance review and updated canonical source.
 - Confirm a feature is `ready-for-planning`; return the created PRD path for catalog update.
 - Read existing planning and decisions to avoid competing artifacts.
 

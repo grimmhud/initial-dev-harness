@@ -12,7 +12,7 @@ For simple local low-risk maintenance, the root may explicitly select the short 
 ## Preconditions
 
 1. Read `AGENTS.md`, the product definition, technical foundation, PRD, derived spec when present, applicable feature Technical Design, and applicable decisions.
-2. For a changed business rule, confirm a `product` handoff and explicit confirmation for any material change.
+2. For a changed business rule, confirm the root agent's documented governance review using `define-and-govern-product`, evidence of the updated canonical source, and explicit user confirmation for any material change.
 3. Confirm the technical foundation is `ready` and the agent capability is `planned`.
 4. Use the documented stack, structure, and official commands; do not choose silent substitutes.
 5. Inspect opening traceability, related decisions, the parent PRD and required dependencies; a superseded parent requires planner reconciliation before executing its child spec; reject `superseded` contracts and follow successors, returning to root if none is executable. Confirm the selected contract has Status `ready` or `active` with readiness/gates satisfied, and is an `executable` PRD or an approved derived spec, with implementable objective, scope, mockup/flow, file tree/impact, behavior, and criteria.
@@ -27,7 +27,7 @@ For simple local low-risk maintenance, the root may explicitly select the short 
 5. Add integration tests for every created or changed flow, contract, persistence path, or integration.
 6. Cover risk-relevant states and failures, not only the happy path.
 7. Run focused implementer checks and inspect the diff for out-of-scope changes, generated artifacts, and sensitive data.
-8. When implementation may obsolete skills, return evidence to the root agent for `synchronize-affected-skills`. Domain/rule drift first requires `product`. Correct only skills assigned to your ownership as `update` in the matrix.
+8. When implementation may obsolete skills, return evidence to the root agent for `synchronize-affected-skills`. Domain/rule drift first requires the root agent's documented governance review using `define-and-govern-product` and evidence of the updated canonical source. Correct only skills assigned to your ownership as `update` in the matrix.
 9. Deliver a reproducible handoff to `quality` and selected verifiers.
 
 ## Backend and frontend

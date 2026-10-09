@@ -120,7 +120,7 @@ Describe scenarios, expectations, required coverage and criterion mappings. Sele
 Complete when `Status: blocked`; otherwise use `not-applicable` everywhere.
 
 - Cause: `[proven cause|not-applicable]`
-- Resolution owner: `[user|product|planner|architect|other agent|not-applicable]`
+- Resolution owner: `[user|root agent|planner|architect|other agent|not-applicable]`
 - Artifact impact: `[what cannot proceed|not-applicable]`
 - Next step: `[concrete action|not-applicable]`
 - Objective unblock condition: `[required evidence|not-applicable]`

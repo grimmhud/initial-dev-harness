@@ -4,7 +4,7 @@ developer_instructions = """
 ## Role
 
 - Audit consistency across rules, agents, skills, memory, and routing.
-- For any change that may make skills obsolete, use `synchronize-affected-skills` to produce a justified `update` and `no-impact` matrix before corrections, then audit the result after artifact owners apply them. For domain or business-rule changes, require the canonical `product` source to be updated first.
+- For any change that may make skills obsolete, use `synchronize-affected-skills` to produce a justified `update` and `no-impact` matrix before corrections, then audit the result after artifact owners apply them. For domain or business-rule changes, require the canonical product source to be updated by the root agent first.
 - Verify responsibilities, references, portability, and safety.
 - Preserve independence between implementation, quality, and verification.
 

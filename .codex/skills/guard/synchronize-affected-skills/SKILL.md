@@ -11,9 +11,9 @@ Keep skills aligned with current repository sources and artifacts without turnin
 
 ## Deterministic ownership
 
-- Canonical ownership follows the change: `product` governs domain, business rules, and product decisions; `architect` governs the technical foundation and project decisions; PRDs/specs, contracts, official commands, and other artifacts retain their repository-defined owners.
+- Canonical ownership follows the change: the root agent governs domain, business rules, and product decisions; `architect` governs the technical foundation and project decisions; PRDs/specs, contracts, official commands, and other artifacts retain their repository-defined owners.
 - `skill_guard` inventories affected skills, requests corrections, and audits the final set.
-- For `product/**`, `product` defines and validates intent but does not edit or approve skills; the root agent assigns another capable existing agent to implement the correction.
+- For `product/**`, the root agent defines and validates canonical intent under user authority and assigns a capable existing agent to implement skill corrections; independent `quality` review and `skill_guard` audit remain required.
 - `planning/**` belongs to `planner`; `architecture/**` to `architect`; `implementation/**` to `backend` or `frontend` by scope; `quality/**` and `verification/verify-backend-flow` to `quality`; other `verification/**` skills to the matching verifier, while preserving independent review.
 - For `coordination/**`, `memory/**`, `guard/**`, `.codex/agents/**`, `AGENTS.md`, and cross-cutting scripts, the root agent assigns a capable existing agent.
 - If the natural owner must also perform mandatory final review, verification, or audit, assign another capable implementer.
@@ -23,7 +23,7 @@ Keep skills aligned with current repository sources and artifacts without turnin
 ## Procedure
 
 1. Identify the change and its authoritative source or artifact.
-2. Confirm acceptance by the applicable source owner. Domain or business-rule changes require a `product` handoff, classification, and updated canonical source; divergent code is only drift evidence. Block when authority is missing.
+2. Confirm acceptance by the applicable source owner. Domain or business-rule changes require a recorded root-agent governance review, classification, and updated canonical source; divergent code is only drift evidence. Block when authority is missing.
 3. Ask `skill_guard` to analyze all potentially affected skills, agents, templates, references, and routing rules.
 4. Record the required `change -> source/artifact -> skills assessed -> update/no-impact -> owner/evidence` matrix. Every candidate receives a justified result.
 5. Route each `update` by ownership, recording natural owner and designated implementer when different. Change behavior, triggers, constraints, examples, and checks only where required.

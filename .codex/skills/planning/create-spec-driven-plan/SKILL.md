@@ -7,7 +7,7 @@ description: Create one PRD per initiative or feature and decide whether it is d
 
 Every planned initiative or feature gets a PRD. It may be directly executable when it is one small or medium, closed, clear, verifiable delivery. Create specs only to divide it into two or more independent or sequential deliverables.
 
-If the technical foundation is missing, `pending`, or insufficient, apply `define-technical-foundation` first. If the product definition is `pending` or a business-rule change lacks a `product` handoff, return to the root agent.
+If the technical foundation is missing, `pending`, or insufficient, apply `define-technical-foundation` first. If the product definition is `pending` or a business-rule change lacks a recorded root-agent product-governance review and updated canonical source, return to the root agent.
 
 ## Flow
 
@@ -28,4 +28,4 @@ The plan is ready when the PRD exists with explicit classification, closed scope
 
 ## Existing contracts and replacement
 
-Apply `references/contract-traceability.md` to every PRD/spec. Before planning changed behavior, find existing contracts and read canonical decisions. Product/architect owns the change decision in `docs/decisions/`; planner creates the replacement, preserves the old body, updates reciprocal Supersedes/Superseded by links and Related decisions on both sides, and reconciles current/historical navigation. A `superseded` document cannot pass executable readiness. Status describes contract lifecycle, not implementation completion.
+Apply `references/contract-traceability.md` to every PRD/spec. Before planning changed behavior, find existing contracts and read canonical decisions. The root agent owns product decisions and architect owns technical decisions in `docs/decisions/`; planner creates the replacement, preserves the old body, updates reciprocal Supersedes/Superseded by links and Related decisions on both sides, and reconciles current/historical navigation. A `superseded` document cannot pass executable readiness. Status describes contract lifecycle, not implementation completion.

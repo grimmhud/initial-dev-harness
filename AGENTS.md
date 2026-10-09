@@ -25,7 +25,7 @@ This file defines the repository's operational invariants. The root agent coordi
 - product objective: `pending`; define it in `docs/product/product-definition.md` when adopting the harness;
 - architecture and boundaries: `pending`; record them in `docs/project/technical-foundation.md` and `docs/decisions/project/`;
 - stack and official commands: `pending`; discover and verify them during initial definition, never infer them from available agents;
-- domain and security rules: `pending`; product owns business semantics and architect owns technical trust boundaries;
+- domain and security rules: `pending`; the root agent governs business semantics and architect owns technical trust boundaries;
 - local conventions: generic harness rules apply until the adopting project records its own foundation and approved planning under `docs/planning/`.
 
 Do not invent missing commands, architecture, or rules. Discover them in the repository or record the gap.
@@ -35,20 +35,19 @@ Do not invent missing commands, architecture, or rules. Discover them in the rep
 - `docs/product/product-definition.md` must be `ready` before the technical foundation or feature planning begins.
 - A feature must be `ready-for-planning` in the product catalog before its PRD is created.
 - `docs/project/technical-foundation.md` must be `ready` before any implementation.
-- Creating, changing, or removing a business rule requires `product` review.
-- Any change to code, contracts, architecture, commands, tests, tooling, domain rules, business rules, or flows that may make a skill obsolete triggers an impact analysis. `skill_guard` inventories and audits the impact, and artifact owners apply corrections before completion. Domain and business-rule changes require `product` to update the canonical source first.
+- Creating, changing, or removing a business rule requires product-governance review by the root agent using `define-and-govern-product`.
+- Any change to code, contracts, architecture, commands, tests, tooling, domain rules, business rules, or flows that may make a skill obsolete triggers an impact analysis. `skill_guard` inventories and audits the impact, and artifact owners apply corrections before completion. Domain and business-rule changes require the root agent to update the canonical source first.
 - A material or conflicting product change requires explicit user confirmation.
 - When an applicable gate is not satisfied, dependent work becomes `blocked` and returns to the root agent with the cause and next step.
 
 Gates are permanent and must not be removed once the project is ready. State belongs only in canonical documents and task memory, never in a duplicate backlog table in this file.
 
-Feature flow: `product` records and releases the feature; `planner` creates the PRD; `product` records its path and status in the catalog without duplicating planning details.
+Feature flow: the root agent directly applies `define-and-govern-product` to record and release the feature; `planner` creates the PRD; the root agent records its path and status in the catalog without duplicating planning details. Product decisions remain subject to user authority; PRDs/specs remain owned by `planner`.
 
 ## 4. Available agents
 
 | Agent | Responsibility |
 |---|---|
-| `product` | Define the product and govern business-rule changes |
 | `planner` | Create a PRD or auditable specification |
 | `architect` | Define and preserve the technical foundation, boundaries, and architectural decisions |
 | `backend` | Implement backend changes and corresponding tests |
@@ -74,7 +73,7 @@ External integrations depend on capability-oriented internal contracts, replacea
 
 The root agent selects the flow by complexity and risk before calling `planner`. Simple, local, low-risk maintenance may proceed with explicit scope, acceptance, and proportional checks without a new PRD/spec; every initiative or feature still requires a PRD. Record the reason and preserve applicable gates and independent quality invariants.
 
-Conceptual feature flow: Product -> PRD -> Technical Design when needed -> executable PRD or vertical specs -> implementation -> quality review -> applicable frontend/backend verification. `architect` produces or reviews explicit feature Technical Design for relevant architectural decisions, within planning or in a linked document; the technical foundation remains global.
+Conceptual feature flow: Product definition (root agent) -> PRD -> Technical Design when needed -> executable PRD or vertical specs -> implementation -> quality review -> applicable frontend/backend verification. `architect` produces or reviews explicit feature Technical Design for relevant architectural decisions, within planning or in a linked document; the technical foundation remains global.
 
 Planning specifies behavior completely without anticipating production code or concrete test files. Short pseudocode, schemas, payloads, signatures, formulas, and input/output examples are allowed only to remove material ambiguity. Relevant behavior uses Given/When/Then scenarios. UI planning includes applicable interface states and visual evidence expectations; the verifier determines capture procedures and relates real evidence to criteria.
 
