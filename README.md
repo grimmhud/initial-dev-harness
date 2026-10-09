@@ -72,14 +72,14 @@ This table summarizes the rules; the authoritative sources remain [`AGENTS.md`](
 
 These are the main workflows for understanding and presenting the harness. The root agent selects the flow and skips stages only with a recorded reason.
 
-| Workflow | When it applies | Typical agents | Outcome |
+| Workflow | When it applies | Agents or prerequisite review | Outcome |
 |---|---|---|---|
-| Initial definition | The repository does not yet have a `ready` product or technical foundation | `product` -> `planner` + `architect` | Product and foundation ready for planning |
-| Feature planning | A feature is `ready-for-planning` | `product` -> `planner` -> `architect` when needed -> `quality` | Executable PRD or approved specs |
+| Initial definition | The repository does not yet have a `ready` product or technical foundation | `planner` + `architect` after product readiness | Product and foundation ready for planning |
+| Feature planning | A feature is `ready-for-planning` | `planner` -> `architect` when needed -> `quality` | Executable PRD or approved specs |
 | Backend implementation | The deliverable changes services, contracts, data, or integrations | `backend` -> `quality` (review and backend verification) | Code, tests, and independent technical verification |
 | Frontend implementation | The deliverable changes the interface, states, or navigation | `frontend` -> `quality` -> `frontend_verifier` when selected | Tested interface and applicable technical/visual evidence |
 | Full-stack implementation | Backend and frontend change with settled contracts and scope | `backend` + `frontend` -> `quality` -> `frontend_verifier` when selected | Integrated flow verified end to end |
-| Business-rule change | A rule is created, changed, or removed | `product` before planning or implementation | Reviewed canonical rule; material change confirmed by the user |
+| Business-rule change | A rule is created, changed, or removed | Business-rule review before planning or implementation | Reviewed canonical rule; material change confirmed by the user |
 | Harness evolution | Changes affect `AGENTS.md`, agents, skills, structural memory, or routing | Change owner -> `quality` -> `skill_guard` | Consistent, audited agent system |
 
 Whenever a change may make skills obsolete, the root agent calls `skill_guard` to analyze the impact before corrections. Owners update the artifacts, `quality` reviews them, and `skill_guard` performs the final audit. This cycle also applies to changes in code, contracts, commands, and rules that affect skills.
@@ -89,18 +89,18 @@ Whenever a change may make skills obsolete, the root agent calls `skill_guard` t
 - **Initial definition** prevents choosing the stack and architecture before the problem is clear.
 - **Planning** separates product and technical decisions from writing code.
 - **Implementation** selects only applicable capabilities and requires approved scope, proportional tests, and review by another agent.
-- **Rule changes** return to `product` to prevent silent changes to business behavior.
+- **Rule changes** require review of the canonical business rules to prevent silent changes to business behavior.
 - **Harness evolution** protects the coordination system from conflicting rules or broken references.
 
 ## From product to executable contract
 
 ```text
-Product -> PRD -> Technical Design (when needed)
+Product definition -> PRD -> Technical Design (when needed)
         -> executable PRD or vertical specs
         -> Implementation -> Quality Review -> applicable verification
 ```
 
-Product owns the problem, users, value, and rules. Planner defines the deliverable and how to prove it works. Architect produces or reviews Technical Design for relevant architectural decisions; simple decisions stay in the PRD/spec. The design may be a section or a linked document. The technical foundation remains global; durable project decisions may produce architecture decision records (ADRs).
+The product definition records the problem, users, value, and rules. Planner defines the deliverable and how to prove it works. Architect produces or reviews Technical Design for relevant architectural decisions; simple decisions stay in the PRD/spec. The design may be a section or a linked document. The technical foundation remains global; durable project decisions may produce architecture decision records (ADRs).
 
 An `executable` PRD covers one small or medium deliverable with settled scope that can be verified end to end. `requires-specs` splits multiple vertical deliverables, never just a table, endpoint, component, or tests. The PRD explains what, why, outcome, flow, and boundaries; specs detail the contract without prescribing production code.
 
@@ -112,7 +112,7 @@ The root agent assesses complexity and risk before calling planner. Simple maint
 
 ## First step in a new project
 
-Before implementing code, open [`docs/project/START_HERE.md`](docs/project/START_HERE.md) and ask the root agent to conduct the initial definition. It calls `product` first and, once the product is sufficiently defined, coordinates `planner` and `architect` to complete the technical foundation.
+Before implementing code, open [`docs/project/START_HERE.md`](docs/project/START_HERE.md) and ask the root agent to conduct the initial definition. Once the product definition is `ready` and sufficient, the root agent coordinates `planner` and `architect` to complete the technical foundation. Missing product decisions block dependent work until they are recorded in the canonical definition.
 
 ```text
 As the root agent, conduct this project's initial definition following
@@ -144,9 +144,6 @@ The diagram below represents the coordinated flow, which begins when the direct-
 flowchart TB
     U([User]) --> O["Root agent (orchestrator)<br/>classifies, routes, and tracks"]
 
-    O -->|"product or business rule"| P["Product<br/>product, catalog, and rules"]
-    P -->|handoff| O
-
     O -->|"planning"| PL["Planner<br/>PRD or auditable spec"]
     PL -->|handoff| O
 
@@ -176,7 +173,7 @@ flowchart TB
     classDef terminal fill:#ecfdf5,color:#064e3b,stroke:#10b981,stroke-width:2px;
     class O hub;
     class I gate;
-    class P,PL,A,B,F,Q,FV,SG agent;
+    class PL,A,B,F,Q,FV,SG agent;
     class U,R terminal;
 ```
 
@@ -202,26 +199,23 @@ A task must not close with agents still in `selected` or `called`. Omitted stage
 
 ### Example: planning a feature
 
-Imagine the request: **"plan a password-recovery feature."** This example assumes the product definition and technical foundation are `ready`. If the product is still `pending`, the flow stops at the product gate and `product` conducts the initial definition first. If the foundation is missing, `pending`, or insufficient, the root agent calls `planner` and `architect` to define it and does not begin feature planning until it is ready.
+Imagine the request: **"plan a password-recovery feature."** This example assumes the product definition and technical foundation are `ready`. The feature must also be recorded as `ready-for-planning` in the product catalog. If the product is still `pending` or required product decisions are missing, the flow stops at the product gate until the canonical definition is ready and sufficient. If the foundation is missing, `pending`, or insufficient, the root agent calls `planner` and `architect` to define it and does not begin feature planning until it is ready.
 
 ```mermaid
 sequenceDiagram
     autonumber
     actor U as User
     participant O as Root agent (orchestrator)
-    participant P as Product
     participant PL as Planner
     participant A as Architect
     participant Q as Quality
 
     U->>O: Plan password recovery
     O->>O: Read product, foundation, memory, and catalog
-    O->>P: Validate feature value, journey, and rules
-    P-->>O: Feature recorded and ready-for-planning
+    Note over O,PL: Prerequisite: feature value, journey, and rules recorded; catalog status ready-for-planning
     O->>PL: Create PRD and classify the deliverable
     PL-->>O: PRD, acceptance criteria, risks, and tests
-    O->>P: Provide the new PRD path
-    P-->>O: Catalog updated to planned
+    Note over O,PL: Catalog records the PRD path and planned status after PRD creation
     opt Relevant technical decision
         O->>A: Produce or review explicit Technical Design
         A-->>O: Design and architectural risks
@@ -234,9 +228,8 @@ sequenceDiagram
         alt Planner owns the cause
             O->>PL: Correct PRD
             PL-->>O: Revised PRD
-        else Product owns the cause
-            O->>P: Correct definition or rule
-            P-->>O: Revised canonical source
+        else Canonical product definition or rule needs correction
+            Note over O,Q: Dependent planning stays blocked until the canonical source is corrected
         else Architect owns the cause
             O->>A: Correct technical decision
             A-->>O: Revised decision
@@ -259,7 +252,6 @@ A simplified final ledger could look like this:
 
 | Agent | Status | Handoff or reason |
 |---|---|---|
-| `product` | `handoff_received` | Feature released for planning |
 | `planner` | `handoff_received` | Executable PRD delivered |
 | `architect` | `skipped` | No new technical decision |
 | `quality` | `handoff_received` | `approved` in `planning-review` |
@@ -269,7 +261,7 @@ If planning may make skills obsolete or change the agent system, `skill_guard` i
 
 ### Example: implementing a feature
 
-Now imagine: **"implement password recovery according to the approved PRD."** This example assumes a `ready` product and technical foundation, plus an `executable` PRD or approved spec. If the request changes a business rule, `product` must review that change before implementation. The diagram illustrates a full-stack deliverable; for a backend-only or frontend-only feature, only the applicable capability is called.
+Now imagine: **"implement password recovery according to the approved PRD."** This example assumes a `ready` product and technical foundation, plus an `executable` PRD or approved spec. If the request changes a business rule, that change requires review and an update to the canonical rules before implementation. Material or conflicting product changes require explicit user confirmation. The diagram illustrates a full-stack deliverable; for a backend-only or frontend-only feature, only the applicable capability is called.
 
 ```mermaid
 sequenceDiagram
@@ -376,7 +368,7 @@ When adopting this harness in another repository, adapt the README to introduce 
 
 PRDs and specs begin with `Status`, `Supersedes`, `Superseded by`, and `Related decisions`. Relative links connect predecessor contracts, successors, and canonical decisions in `docs/decisions/`. The full rationale remains in the decision; Git preserves diffs but does not replace this navigation.
 
-Product/Architect evaluates the change and records the decision; Planner creates the successor contract and updates links in both directions. The predecessor receives `superseded`, preserves its historical content, and is no longer executable. `ready` indicates completed planning; `active` identifies the contract accepted as current and does not mean implementation is complete. `draft` and `blocked` still prevent premature execution.
+The change must be evaluated and its accepted decision recorded in the canonical product or project decisions before contract replacement; Architect evaluates relevant technical decisions. Planner creates the successor contract and updates links in both directions. The predecessor receives `superseded`, preserves its historical content, and is no longer executable. `ready` indicates completed planning; `active` identifies the contract accepted as current and does not mean implementation is complete. `draft` and `blocked` still prevent premature execution.
 
 See the [traceability rules](.codex/skills/planning/create-spec-driven-plan/references/contract-traceability.md).
 
