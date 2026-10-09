@@ -9,12 +9,12 @@ The root agent may answer without coordinated flow only when ALL criteria hold: 
 Before technical foundation or planning, read `docs/product/product-definition.md`:
 
 - `ready` and sufficient: continue;
-- `pending`, missing, or insufficient: call `product` with `define-and-govern-product`;
-- business rule added, changed, or removed: call `product` before `planner`;
-- a change may obsolete skills: apply `synchronize-affected-skills`; for domain/rules, do so after `product` updates the canonical source;
+- `pending`, missing, or insufficient: the root agent directly applies `define-and-govern-product`;
+- business rule added, changed, or removed: the root agent reviews the change using `define-and-govern-product` and updates the canonical source before calling `planner`;
+- a change may obsolete skills: apply `synchronize-affected-skills`; for domain/rules, do so after the root agent updates the canonical source;
 - a `material` or `conflicting` change: remain `blocked` until explicit user confirmation.
 
-For a new feature: `product` records and releases it as `ready-for-planning`; the root agent calls `planner`; `planner` creates the PRD; the root agent returns its path to `product`; `product` records the PRD and `planned` status.
+For a new feature: the root agent directly applies `define-and-govern-product`, records and releases the feature as `ready-for-planning`, then calls `planner`. Planner creates the PRD and returns its path; the root agent records the path and `planned` status in the catalog.
 
 ## Technical-foundation gate
 
@@ -31,7 +31,7 @@ Backend and frontend are never assumed merely because agents exist. Availability
 
 Use for PRDs, specs, technical decisions, or documentation that prepares implementation.
 
-`root -> product when needed -> skill_guard impact inventory when applicable -> planner drafts PRD -> architect Technical Design when relevant -> planner consolidates executable PRD/specs -> assigned owners synchronize affected skills -> quality planning review -> skill_guard final audit when applicable -> root final`
+`root product governance when needed -> skill_guard impact inventory when applicable -> planner drafts PRD -> architect Technical Design when relevant -> planner consolidates executable PRD/specs -> assigned owners synchronize affected skills -> quality planning review -> skill_guard final audit when applicable -> root final`
 
 If review fails, return to the responsible owner and repeat only the necessary correction and review stages. Planning does not implement product code.
 
@@ -39,7 +39,7 @@ If review fails, return to the responsible owner and repeat only the necessary c
 
 Use when changing code, tests, contracts, persistence, integrations, or runtime.
 
-`root -> product for business rules -> skill_guard impact inventory when applicable -> planner/architect by risk -> backend and/or frontend -> assigned owners synchronize affected skills -> quality review and backend verification -> frontend_verifier when selected -> skill_guard final audit when applicable -> root final`
+`root business-rule governance when needed -> skill_guard impact inventory when applicable -> planner/architect by risk -> backend and/or frontend -> assigned owners synchronize affected skills -> quality review and backend verification -> frontend_verifier when selected -> skill_guard final audit when applicable -> root final`
 
 Backend and frontend may work in parallel when scope and contracts are closed. `quality` always applies proportional `verify-backend-flow` when backend exists. `frontend_verifier` requires an operational browser backend once selected; unavailable tooling results in `blocked`, not a skip.
 
@@ -55,13 +55,13 @@ A short flow is a reduced planning or implementation flow for a simple, local, l
 
 Assess complexity and risk before selecting `planner`. Simple, local, low-risk maintenance with known behavior may use explicit scope -> implementation -> proportional quality review. Record objective, scope, acceptance, checks, and why planning is skipped in task memory. This remains coordinated work, not the read-only exception. New initiatives/features still require a PRD and product catalog readiness; short flow does not bypass product review for changed rules or the foundation gate.
 
-For features: Product -> PRD -> conditional Technical Design -> executable PRD or vertical specs -> implementation -> quality -> applicable verification. Select `architect` for material boundary, data, concurrency, failure, security, compatibility, migration, or rollout decisions. Simple technical decisions stay in PRD/spec; relevant architecture needs explicit Technical Design produced or reviewed by `architect`, embedded or linked. Return the design to `planner` before declaring dependent contracts ready. Unresolved critical design blocks dependent implementation. Durable project-wide decisions also belong in an ADR and the current foundation.
+For features: Product definition (root agent) -> PRD -> conditional Technical Design -> executable PRD or vertical specs -> implementation -> quality -> applicable verification. Select `architect` for material boundary, data, concurrency, failure, security, compatibility, migration, or rollout decisions. Simple technical decisions stay in PRD/spec; relevant architecture needs explicit Technical Design produced or reviewed by `architect`, embedded or linked. Return the design to `planner` before declaring dependent contracts ready. Unresolved critical design blocks dependent implementation. Durable project-wide decisions also belong in an ADR and the current foundation.
 
 The root chooses whether `frontend_verifier` is needed using the criteria above. Planning defines what visual behavior must be proven; the verifier chooses how, executes the real browser, and maps screenshots/evidence to criteria. Backend verification remains owned by `quality`; do not introduce a separate backend verifier agent.
 
 ## Replacing planned behavior
 
-Product/architect evaluates the change and records the accepted canonical decision before planner replaces affected contracts. Apply planning's `create-spec-driven-plan/references/contract-traceability.md`: preserve historical bodies, reciprocal effective predecessor/successor links, and direct decision links on both sides. Reconcile catalog/index navigation via its owner. Never dispatch implementation from a superseded contract; unresolved successor readiness blocks dependent work. Document `active` is not evidence of runtime completion.
+The root agent evaluates product changes and architect evaluates technical changes; each records the accepted canonical decision within that responsibility before planner replaces affected contracts. Apply planning's `create-spec-driven-plan/references/contract-traceability.md`: preserve historical bodies, reciprocal effective predecessor/successor links, and direct decision links on both sides. Reconcile catalog/index navigation via its owner. Never dispatch implementation from a superseded contract; unresolved successor readiness blocks dependent work. Document `active` is not evidence of runtime completion.
 
 ## Handoff and review ordering
 

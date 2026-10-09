@@ -12,7 +12,7 @@ A spec represents an observable, auditable deliverable—not an internal task. I
 ## Preconditions
 
 - The technical foundation and product definition are `ready` and sufficient.
-- Changed rules have a `product` handoff and material-change confirmation.
+- Changed rules have a recorded root-agent product-governance review and updated canonical source and material-change confirmation.
 - Critical dependencies and decisions are resolved or explicitly blocking.
 
 ## Required content

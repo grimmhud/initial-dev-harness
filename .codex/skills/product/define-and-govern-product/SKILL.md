@@ -5,11 +5,11 @@ description: Define the product and govern business-rule changes, blocking mater
 
 # Define And Govern Product
 
-Use with `product` during project initialization, whenever product context is missing, and whenever a business rule is created, changed, or removed.
+The root agent applies this skill directly during project initialization, whenever product context is missing, and whenever a business rule is created, changed, or removed.
 
 ## Canonical sources
 
-`docs/product/product-definition.md` contains the consolidated current product view; `docs/product/references/` contains relevant sources and research; `docs/decisions/product/` contains durable product decisions owned by `product`. PRDs and specs remain in `docs/planning/` and belong to `planner`.
+`docs/product/product-definition.md` contains the consolidated current product view; `docs/product/references/` contains relevant sources and research; `docs/decisions/product/` contains durable product decisions maintained by the root agent under user decision authority. PRDs and specs remain in `docs/planning/` and belong to `planner`.
 
 ## Initial definition
 
@@ -17,7 +17,7 @@ Use with `product` during project initialization, whenever product context is mi
 2. Separate proven facts, assumptions, and decisions requiring the user.
 3. Define the problem, users, needs, value proposition, goals, scope, out of scope, capabilities, features, journeys, principles, business rules, metrics, constraints, and risks.
 4. Run the system-completeness check before treating one requested feature as the whole product.
-5. Return short prioritized questions through the root agent and update the product definition after each confirmed decision.
+5. Ask the user short prioritized questions and update the product definition after each confirmed decision.
 6. Mark `ready` only when the product can guide technical foundation and planning without invented intent.
 
 ## System-completeness check
@@ -39,7 +39,7 @@ For each feature, record a stable slug/name, problem or value, related capabilit
 
 `idea -> discovery -> ready-for-planning -> planned -> in-progress -> delivered -> deprecated`
 
-`product` moves a feature to `ready-for-planning` when its objective, user, value, dependencies, and journey responsibility are clear. The root agent calls `planner`; `product` does not write the PRD. Once the PRD exists, record its path, set `planned`, and append the transition history. Keep scope, mockups, file trees, acceptance, and tests only in PRDs/specs. A technical initiative that adds no user-perceived capability may have a PRD without becoming a feature when planning records why.
+The root agent moves a feature to `ready-for-planning` when its objective, user, value, dependencies, and journey responsibility are clear. The root agent calls `planner`, which owns PRD/spec creation. Once the PRD exists, record its path, set `planned`, and append the transition history. Keep scope, mockups, file trees, acceptance, and tests only in PRDs/specs. A technical initiative that adds no user-perceived capability may have a PRD without becoming a feature when planning records why.
 
 ## Business-rule governance
 
@@ -47,9 +47,9 @@ For each feature, record a stable slug/name, problem or value, related capabilit
 2. Identify affected features, users, journeys, contracts, data, metrics, and behavior.
 3. Classify the change `compatible`, `material`, or `conflicting`.
 4. For `compatible`, update the canonical source and hand impact to `planner`.
-5. For `material` or `conflicting`, return `blocked` through the root agent with context, impact, alternatives, and a confirmation question. Do not accept or release the change yet.
+5. For `material` or `conflicting`, keep dependent work `blocked` and present context, impact, alternatives, and a confirmation question to the user. Do not accept or release the change yet.
 6. After explicit confirmation, record a product decision, update the consolidated definition, and deliver the new product contract.
-7. Flag the confirmed rule for `synchronize-affected-skills`. `product` provides canonical intent but neither edits nor approves the skills.
+7. Flag the confirmed rule for `synchronize-affected-skills`. The root agent provides canonical intent and assigns skill corrections to a capable existing agent, preserving independent `quality` review and `skill_guard` audit.
 
 A change is material when it affects the core problem, target audience, value proposition, primary capability, critical journey, promised outcome, financial/pricing/permission/privacy/security/legal rules, destructive or irreversible behavior, user-visible compatibility, principal metric, fundamental constraint/principle, or an accepted product decision. When uncertain, classify it as material and expose the uncertainty.
 
@@ -57,10 +57,10 @@ A change is material when it affects the core problem, target audience, value pr
 
 Silence, ambiguity, existing implementation, or an unaccepted recommendation is not confirmation. For every confirmed `material` or `conflicting` decision, preserve structured authority evidence—even after supersession—as `direct-choice`, `delegation`, or `accepted-recommendation`. Record a traceable source, short faithful summary, affected options, scope, and recorder without copying long transcripts or sensitive data. `not-applicable` is allowed only for `compatible` or never-confirmed `proposed` decisions.
 
-## Limits and handoff
+## Limits and delivery
 
-Do not choose stack/architecture/commands, create implementation PRDs/specs, edit code, convert references into confirmed requirements, or duplicate technical documentation. Report definition status, change classification, updated documents, affected rules, confirmed decisions, questions/blockers, impacts for `planner`/`architect`, remaining risks, and for initial definition a journey map, feature groups, and MVP-completeness rationale.
+While applying this skill, do not choose stack/architecture/commands, create implementation PRDs/specs, edit code, convert references into confirmed requirements, or duplicate technical documentation. Report definition status, change classification, updated documents, affected rules, confirmed decisions, questions/blockers, impacts for `planner`/`architect`, remaining risks, and for initial definition a journey map, feature groups, and MVP-completeness rationale.
 
 ## Changes to existing planning
 
-When any accepted change replaces a planned rule or behavior, including a `compatible` change, record its rationale, alternatives, and consequences in `docs/decisions/product/` before planner creates the replacement contract. Return decision path and affected planning scope through root; planner owns historical headers and reciprocal links. Update catalog navigation when the successor is accepted. Catalog `planned` indicates a PRD exists, not that blockers or execution gates are resolved.
+When any accepted change replaces a planned rule or behavior, including a `compatible` change, record its rationale, alternatives, and consequences in `docs/decisions/product/` before planner creates the replacement contract. Pass the decision path and affected planning scope to planner; planner owns historical headers and reciprocal links. Update catalog navigation when the successor is accepted. Catalog `planned` indicates a PRD exists, not that blockers or execution gates are resolved.

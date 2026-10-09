@@ -2,7 +2,7 @@
 
 Follow this document first when starting a project. No implementation begins before the technical foundation is ready.
 
-The user can start the full process by asking the root agent to conduct the initial definition. The root agent calls `product` first and `planner`/`architect` afterward, asks staged questions, and records answers; the user does not call each agent manually.
+The user can start the full process by asking the root agent to conduct the initial definition. The root agent directly defines and governs the product using `define-and-govern-product`, then calls `planner`/`architect`, asks staged questions, and records answers; the user does not call each agent manually.
 
 ## Expected outcome
 
@@ -20,9 +20,9 @@ The user can start the full process by asking the root agent to conduct the init
 
 ### 1. Define the product
 
-The root agent calls `product` with `.codex/skills/product/define-and-govern-product/SKILL.md`. Record the idea, problem, users, value proposition, goals, scope, capabilities, features, journeys, business rules, references, constraints, metrics, and risks under `docs/product/`.
+The root agent directly applies `.codex/skills/product/define-and-govern-product/SKILL.md`. Record the idea, problem, users, value proposition, goals, scope, capabilities, features, journeys, business rules, references, constraints, metrics, and risks under `docs/product/`.
 
-When a choice depends on preference, cost, or product tradeoff, `product` returns the question through the root agent instead of assuming. The technical foundation remains blocked while the product is `pending`.
+When a choice depends on preference, cost, or product tradeoff, the root agent asks the user instead of assuming. The technical foundation remains blocked while the product is `pending`.
 
 ### 2. Define the technical project
 

@@ -16,14 +16,14 @@ For `guard/**`, analyze and request corrections, but require another existing ag
 ## Checklist
 
 - Required agents exist and their names match routing.
-- `product` owns product definitions/rules and `docs/decisions/product/`; `planner` owns PRDs/specs; `architect` owns the technical foundation and `docs/decisions/project/`.
+- The root agent directly governs product definitions/rules and `docs/decisions/product/`; `planner` owns PRDs/specs; `architect` owns the technical foundation and `docs/decisions/project/`.
 - Every TOML has `name`, `description`, and instructions covering role, limits, and handoff.
 - Every skill has valid frontmatter, purpose, triggers, procedure, constraints, and delivery.
 - References and paths exist and contain no unrelated product artifacts.
 - `AGENTS.md`, agents, and skills do not conflict.
 - Implementers and `quality` remain independent; `frontend_verifier` remains independent when selected. `Quality` may combine review and backend verification but never implements the change under review.
-- Business-rule changes require `product`; material changes require explicit user confirmation.
-- Potentially obsoleting changes have a `change -> source/artifact -> skills assessed -> update/no-impact -> owner/evidence` matrix and proof that stale instructions are gone. Domain/rule changes first have a `product` handoff.
+- Business-rule changes require root-agent review using `define-and-govern-product`; material changes require explicit user confirmation.
+- Potentially obsoleting changes have a `change -> source/artifact -> skills assessed -> update/no-impact -> owner/evidence` matrix and proof that stale instructions are gone. Domain/rule changes first have a recorded root-agent governance review, classification, and canonical source update.
 - An operational browser MCP or `agent-browser` remains mandatory when `frontend_verifier` is selected.
 - Frontend screenshots remain under `tmp/<feature-slug>/<deliverable>/<test-name>/` and their paths appear in the handoff.
 - Ledger, `blocked`, `skipped`, and handoff remain defined.

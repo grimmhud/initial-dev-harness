@@ -14,8 +14,8 @@ The direct-request exception applies only when ALL criteria hold: the request is
 ## Procedure
 
 1. Read `AGENTS.md`, the product definition, technical foundation, memory skill, stable context, and `active-task.md`; initialize memory if needed.
-2. If the product definition is missing, `pending`, or insufficient, apply `define-and-govern-product` with `product` before technical planning, architecture, or implementation.
-3. Route every business-rule addition, change, removal, or domain conflict through `product`. Keep material or conflicting changes `blocked` until explicit user confirmation.
+2. If the product definition is missing, `pending`, or insufficient, directly apply `define-and-govern-product` before technical planning, architecture, or implementation.
+3. Directly review every business-rule addition, change, removal, or domain conflict using `define-and-govern-product` and update the canonical source. Keep material or conflicting changes `blocked` until explicit user confirmation.
 4. For a change that may make skills obsolete, apply `synchronize-affected-skills`; record the impact matrix, correction owners, and final `skill_guard` audit.
 5. When the product is sufficient but the technical foundation is not, apply `define-technical-foundation` with `planner` and `architect` before implementation.
 6. Discover feature planning and repository state, then classify the task as planning or implementation. Assess complexity/risk before selecting `planner`; use a short flow for simple local maintenance only with recorded scope, acceptance, checks, and justification. Features still require PRDs. Apply the conditional Technical Design routing in `references/routing.md`.
@@ -27,10 +27,10 @@ The direct-request exception applies only when ALL criteria hold: the request is
 
 ## Initial-definition mode
 
-1. `product` gathers what can be established from the repository, references, and documents.
+1. The root agent gathers what can be established from the repository, references, and documents.
 2. The root agent consolidates only product decisions that truly require the user.
 3. Ask short staged questions, explaining why each answer matters and what it unlocks.
-4. After each answer, `product` updates the product definition; update `AGENTS.md` only for global rules and update operational memory with state and gaps.
+4. After each answer, the root agent updates the product definition; update `AGENTS.md` only for global rules and update operational memory with state and gaps.
 5. Repeat until applicable fields are decided or `not-applicable`.
 6. Present a summary for confirmation before marking the product `ready` and starting the technical foundation.
 
@@ -42,11 +42,13 @@ Do not turn the conversation into a long form, ask for discoverable facts, or pr
 |---|---|---:|---|---|---|
 | planner | scope/spec | conditional | selected | pending | - |
 
+Record direct root-agent product governance as task phases and canonical evidence, not as a specialist call or self-handoff.
+
 Statuses: `selected`, `called`, `handoff_received`, `skipped`, `blocked`. A skip needs a reason. A blocker needs a cause and next step. Never finish with `selected` or `called`.
 
 ## Constraints
 
-- The root agent coordinates and performs only work that legitimately belongs to the primary role. It does not absorb specialist responsibilities, self-approve its delivery, or simulate required agents.
+- The root agent coordinates and performs only work that legitimately belongs to the primary role. Product definition, catalog maintenance, and business-rule governance belong directly to the root agent through `define-and-govern-product`, subject to user decision authority. It does not absorb other specialist responsibilities, self-approve its delivery, or simulate required agents.
 - Do not duplicate checks across verifiers.
 - Manage memory with `manage-operational-memory`; never use it as a Git or documentation substitute.
 - Never store secrets or raw sensitive data.
