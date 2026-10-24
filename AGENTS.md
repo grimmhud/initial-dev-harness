@@ -97,6 +97,6 @@ Planning specifies behavior completely without anticipating production code or c
 
 ## 8. Final handoff
 
-Every coordinated delivery reports: outcome; changed files; planning satisfied; participating agents; skipped steps and reasons; verifications and results; omitted verifications and reasons; blockers; risks; and remaining decisions.
+Every coordinated delivery includes an organized, traceable handoff with all actual test and verification evidence, including applicable images and scenarios. The required contents and presentation follow the coordination skill's [final-handoff contract](.codex/skills/coordination/primary-agent-coordination/references/final-handoff.md).
 
 A direct request reports only the result, the local evidence consulted, and any relevant limitation.

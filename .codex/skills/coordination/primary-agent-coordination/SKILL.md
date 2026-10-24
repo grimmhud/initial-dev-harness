@@ -23,7 +23,7 @@ The direct-request exception applies only when ALL criteria hold: the request is
 8. Update `active-task.md` after each meaningful phase.
 9. Require `quality` for code. With backend, `quality` also applies `verify-backend-flow`. Select `frontend_verifier` by the routing rules. Require `skill_guard` for agent-system changes or affected-skill synchronization.
 10. Promote only durable information to decisions, projects, runbooks, or errors.
-11. Before completion, terminalize the ledger, incorporate the last handoff, leave `active-task.md` `idle` or `blocked`, write the session, and produce the final handoff. Use repository-relative paths in memory.
+11. Before completion, apply [the final-handoff contract](references/final-handoff.md), consolidate all actual test and verification evidence from participating agents, terminalize the ledger, incorporate the last handoff, leave `active-task.md` `idle` or `blocked`, write the session, and produce the final handoff. Use repository-relative paths in memory.
 
 ## Initial-definition mode
 
