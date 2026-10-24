@@ -13,4 +13,4 @@ Start with the most focused check, then broaden. Never invent commands or succes
 
 For external integrations, apply `enforce-external-integration-boundaries` and confirm through tests/evidence that internal contract, adapter, and composition remain separate, failures are translated, and provider dependencies do not leak into business rules. A proportional replaceability test may replace an actual provider swap.
 
-Include every command, exit status, evidence summary, omitted check, failure, and routing decision in the `quality` handoff.
+Include every command, exit status, evidence summary, omitted check, failure, and routing decision in the `quality` handoff. Follow the coordination skill's [final-handoff contract](../../coordination/primary-agent-coordination/references/final-handoff.md) to map scenarios and criteria to expected and observed results, record executor and environment, link all produced artifacts (including applicable images), and preserve failure/retest history for the root agent's consolidated delivery.
